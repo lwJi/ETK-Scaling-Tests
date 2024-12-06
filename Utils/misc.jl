@@ -3,7 +3,10 @@ module Misc
 using DelimitedFiles
 using Plots
 
-# load
+#############
+# load data #
+#############
+
 function load_data(fnames::Vector{String}, dir::String, pattern::Regex)::Vector{Vector{Vector{Float64}}}
     dats = Vector{Vector{Vector{Float64}}}()
     for fname in fnames
@@ -34,19 +37,46 @@ function load_data(fnames::Vector{String}, dir::String, pattern::Regex)::Vector{
     return dats
 end
 
-function load_data_manual(fnames, dir)
-    dats = []
-    for fname in fnames
-        data = readdlm(joinpath(dir, fname), Float64, comments=true)
-        nodes = data[:, 1]
-        cycle = data[:, 2]
-        speed = data[:, 3]
-        push!(dats, [nodes, cycle, speed])
+function load_data_manually(fnames::Vector{String}, dir::String)::Vector{Dict{String, Vector{Float64}}}
+    dats = Vector{Dict{String, Vector{Float64}}}(undef, length(fnames))
+    
+    for (i, fname) in enumerate(fnames)
+        file_path = joinpath(dir, fname)
+        
+        # Safely read data and handle errors
+        try
+            data = readdlm(file_path, Float64, comments=true)
+            
+            if size(data, 2) < 3
+                throw(ArgumentError("File $fname does not have the required number of columns."))
+            end
+            
+            nodes = data[:, 1]
+            cycle = data[:, 2]
+            speed = data[:, 3]
+            
+            dats[i] = Dict(
+                "nodes" => nodes,
+                "cycle" => cycle,
+                "speed" => speed
+            )
+        catch e
+            println("Error reading file $file_path: $e")
+            dats[i] = Dict(
+                "nodes" => Float64[],
+                "cycle" => Float64[],
+                "speed" => Float64[]
+            )
+        end
     end
+    
     return dats
 end
 
-# plot
+########
+# plot #
+########
+
 function plot_speed(plt, nodes, dir; prefix="N", range=:,
     pattern=r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)")
     #pattern=r"Grid cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
