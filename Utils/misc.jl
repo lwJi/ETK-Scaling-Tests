@@ -4,13 +4,13 @@ using DelimitedFiles
 using Plots
 
 # load
-function load_data(fnames, dir, pattern)
-    dats = []
+function load_data(fnames::Vector{String}, dir::String, pattern::Regex)::Vector{Vector{Vector{Float64}}}
+    dats = Vector{Vector{Vector{Float64}}}()
     for fname in fnames
         data = readlines(joinpath(dir, fname))
-        matches_step = []
-        matches_time = []
-        matches_patt = []
+
+        matches_step, matches_time, matches_patt = Float64[], Float64[], Float64[]
+
         for row in data
             m_time = match(r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)", row)
             m_step = match(r"\(CarpetX\):   total iterations:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)", row)
@@ -25,9 +25,12 @@ function load_data(fnames, dir, pattern)
                 push!(matches_patt, parse(Float64, m_patt.captures[1]))
             end
         end
+
+        # Synchronize lengths to the minimum length of all three match arrays
         len = minimum([length(matches_step), length(matches_time), length(matches_patt)])
         push!(dats, [matches_step[1:len], matches_time[1:len], matches_patt[1:len]])
     end
+
     return dats
 end
 
