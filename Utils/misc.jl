@@ -87,22 +87,39 @@ end
 ########
 
 function plot_speed(
-    plt,
-    nodes,
-    dir;
-    prefix = "N",
-    range = :,
-    pattern = r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
-)
-    #pattern=r"Grid cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
-    files = [prefix * string(i) * "/stdout.txt" for i in nodes]
+    plt::Plots.Plot,
+    nodes::Vector{Int},
+    dir::String;
+    prefix::String = "N",
+    range::Union{Symbol, UnitRange{Int}} = :,
+    pattern::Regex = r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
+    #pattern::Regex=r"Grid cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
+)::Plots.Plot
+    # Generate file paths based on nodes and prefix
+    files = [joinpath(prefix * string(node), "stdout.txt") for node in nodes]
+
+    # Load data using the provided pattern
     datas = load_data(files, dir, pattern)
-    for i = 1:length(datas)
-        label_i = prefix * string(nodes[i])
-        x = datas[i][1][range]  # steps
-        y = datas[i][3][range]  # value
-        plt = plot!(x, y, seriestype = :line, marker = :circle, label = label_i)
+
+    # Check if datas is non-empty and iterate
+    for (i, data) in enumerate(datas)
+        if length(data) < 3 || isempty(data[1]) || isempty(data[3])
+            println("Skipping node $nodes[i]: Data is incomplete.")
+            continue
+        end
+        
+        # Extract steps and values, applying the specified range
+        steps = data[1][range]
+        values = data[3][range]
+        
+        # Generate label for the current node
+        label = prefix * string(nodes[i])
+        
+        # Plot the data
+        plt = plot!(steps, values, seriestype=:line, marker=:circle, label=label)
     end
+
+    return plt
 end
 
 function calc_avgs(datas, range)
