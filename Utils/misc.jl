@@ -8,9 +8,22 @@ using DelimitedFiles
 
 function load_data(
     dirs::Vector{Tuple{String,String}},
-    parent_dir::String;
-    pattern::Regex = r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
+    parent_dir::String,
+    option::String,
 )::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
+    # Define patterns for specific options
+    patterns = Dict(
+        "TotalComputeTime" =>
+            r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
+        "ZcsPerSecond" =>
+            r"average cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
+    )
+
+    # Get the appropriate pattern or throw an error for an invalid option
+    pattern = get(patterns, option) do
+        error("Invalid option: $option. Valid options are: $(keys(patterns))")
+    end
+
     # Precompile regex patterns for better performance
     time_pattern =
         r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
@@ -67,45 +80,72 @@ function load_data(
 end
 
 # Function to calculate averages for a given dataset
-function calc_avgs(dats::Vector{Vector{Vector{Float64}}}, range)::Vector{Float64}
-    avgs = Float64[]
+function calc_avgs(
+    dats::Vector{Vector{Vector{Float64}}},
+    range,
+    option::String,
+)::Vector{Float64}
+    # Define constants for conversions
+    secs_per_day = 3600 * 24
 
-    for dat in dats
-        x = dat[2][range]  # time
-        y = dat[3][range]  # value
-        push!(avgs, (3600 * 24) * ((x[end] - x[1]) / (y[end] - y[1])))  # M/day
-        #push!(avgs, mean(y))  # ZCs/sec
+    # Define calculations for each option using a dictionary
+    option_calculations = Dict(
+        "TotalComputeTime" =>
+            (x, y) -> secs_per_day * ((x[end] - x[1]) / (y[end] - y[1])),
+        "ZcsPerSecond" => (_, y) -> mean(y),
+    )
+
+    # Check for valid option
+    calc_fn = get(option_calculations, option) do
+        error("Invalid option: $option. Valid options are: $(keys(option_calculations)).")
+    end
+
+    # Preallocate results
+    avgs = Vector{Float64}(undef, length(dats))
+
+    # Process each dataset
+    for (i, dat) in enumerate(dats)
+        # Extract time and value data for the given range
+        x = dat[2][range]
+        y = dat[3][range]
+
+        # Perform the calculation
+        avgs[i] = calc_fn(x, y)
     end
 
     return avgs
 end
 
-# Function to load speed averages based on directory patterns
-function load_speed_avgs(
+# Function to load averages based on options
+function load_avgs(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
     range = :,
+    option::String = "TotalComputeTime",
     fname::String = "stdout.txt",
 )::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
     # Preallocate the dats container
     avgs = Vector{Vector{Vector{Float64}}}()
-    labs = [label for (_, label) in dir_patterns]      # Extract labels
+    labs = Vector{String}()
 
-    for (dir_pattern, _) in dir_patterns
-        # Find matching directories using the regex pattern
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Containers for matched directories and extracted values
         dirs = Vector{Tuple{String,String}}()
         xs = Vector{Float64}()
 
         for dir in readdir(parent_dir; join = false)
             if (m = match(dir_pattern, dir)) !== nothing
-                label = match(r"N(\d+)", dir).captures[1]  # Extract label from the dirname
-                push!(dirs, (joinpath(dir, fname), "N$label"))
-                push!(xs, parse(Float64, label))
+                label_value = parse(Float64, match(r"N(\d+)", dir).captures[1])
+                push!(dirs, (joinpath(dir, fname), "N$label_value"))
+                push!(xs, label_value)
             end
         end
 
-        (dats, _) = load_data(dirs, parent_dir)
-        push!(avgs, [xs, calc_avgs(dats, range)])
+        # Load data and compute averages if directories are found
+        (dats, _) = load_data(dirs, parent_dir, option)
+        push!(avgs, [xs, calc_avgs(dats, range, option)])
+        push!(labs, label)
     end
 
     return (avgs, labs)
