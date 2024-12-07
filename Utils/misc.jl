@@ -1,7 +1,6 @@
 module Misc
 
 using DelimitedFiles
-using Plots
 
 #############
 # load data #
@@ -9,8 +8,8 @@ using Plots
 
 function load_data(
     dirs::Vector{Tuple{String,String}},
-    parent_dir::String,
-    pattern::Regex,
+    parent_dir::String;
+    pattern::Regex = r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
 )::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
     # Precompile regex patterns for better performance
     time_pattern =
