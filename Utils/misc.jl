@@ -8,27 +8,20 @@ using Plots
 #############
 
 function load_data(
-    fnames::Vector{String},
-    dir::String,
+    dirs::Vector{Tuple{String,String}},
+    parent_dir::String,
     pattern::Regex,
 )::Vector{Vector{Vector{Float64}}}
     # Precompile regex patterns for better performance
     time_pattern = r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
     step_pattern = r"\(CarpetX\):   total iterations:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
 
-    # Preallocate the results container
-    results = Vector{Vector{Vector{Float64}}}(undef, length(fnames))
+    # Preallocate the dats container
+    dats = Vector{Vector{Vector{Float64}}}()
+    labs = [label for (_, label) in dirs]      # Extract labels
 
-    for (i, fname) in enumerate(fnames)
-        file_path = joinpath(dir, fname)
-
-        # Attempt to read the file
-        lines = try
-            readlines(file_path)
-        catch e
-            println("Error reading file $file_path: $e")
-            continue
-        end
+    for (subdir, _) in dirs
+        fname = joinpath(parent_dir, subdir)
 
         # Initialize containers for matched data
         steps = Float64[]
@@ -36,7 +29,7 @@ function load_data(
         custom_matches = Float64[]
 
         # Process each line in the file
-        for line in lines
+        for line in readlines(fname)
             # Match and parse simulation time
             if m_time = match(time_pattern, line)
                 push!(times, parse(Float64, m_time.captures[1]))
@@ -53,16 +46,10 @@ function load_data(
 
         # Ensure arrays are synchronized to the minimum length
         min_len = minimum([length(steps), length(times), length(custom_matches)])
-        if min_len > 0
-            results[i] = [steps[1:min_len], times[1:min_len], custom_matches[1:min_len]]
-        else
-            println("Warning: No valid data found in file $fname.")
-            results[i] = [Float64[], Float64[], Float64[]]
-        end
+        push!(dats, [steps[1:min_len], times[1:min_len], custom_matches[1:min_len]])
     end
 
-    # Filter out empty entries and return the results
-    return filter!(!isempty, results)
+    return (dats, labs)
 end
 
 end
