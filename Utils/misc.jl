@@ -41,15 +41,15 @@ function load_data(
         # Process each line in the file
         for line in lines
             # Match and parse simulation time
-            if m_time = match(time_pattern, line)
+            if (m_time = match(time_pattern, line)) !== nothing
                 push!(times, parse(Float64, m_time.captures[1]))
             end
             # Match and parse total iterations
-            if m_step = match(step_pattern, line)
+            if (m_step = match(step_pattern, line)) !== nothing
                 push!(steps, parse(Float64, m_step.captures[1]))
             end
             # Match and parse custom pattern
-            if m_custom = match(pattern, line)
+            if (m_custom = match(pattern, line)) !== nothing
                 push!(custom_matches, parse(Float64, m_custom.captures[1]))
             end
         end
