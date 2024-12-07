@@ -1,6 +1,7 @@
 module Misc
 
 using DelimitedFiles
+using Statistics
 
 #############
 # load data #
