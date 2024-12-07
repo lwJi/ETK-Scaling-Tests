@@ -66,23 +66,27 @@ function load_data(
     return (dats, labs)
 end
 
-function calc_avgs(dats, range)
-    avgs = []
-    for i in 1:length(dats)
-        x = dats[i][2][range]  # time
-        y = dats[i][3][range]  # value
+# Function to calculate averages for a given dataset
+function calc_avgs(dats::Vector{Vector{Vector{Float64}}}, range)::Vector{Float64}
+    avgs = Float64[]
+
+    for dat in dats
+        x = dat[2][range]  # time
+        y = dat[3][range]  # value
         push!(avgs, (3600 * 24) * ((x[end] - x[1]) / (y[end] - y[1])))  # M/day
         #push!(avgs, mean(y))  # ZCs/sec
     end
+
     return avgs
 end
 
+# Function to load speed averages based on directory patterns
 function load_speed_avgs(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
-    range=:,
+    range = :,
     fname::String = "stdout.txt",
-)
+)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
     # Preallocate the dats container
     avgs = Vector{Vector{Vector{Float64}}}()
     labs = [label for (_, label) in dir_patterns]      # Extract labels
@@ -90,20 +94,20 @@ function load_speed_avgs(
     for (dir_pattern, _) in dir_patterns
         # Find matching directories using the regex pattern
         dirs = Vector{Tuple{String,String}}()
-        xaxi = Vector{Float64}()
-        for dir in readdir(parent_dir; join=false)
+        xs = Vector{Float64}()
+
+        for dir in readdir(parent_dir; join = false)
             if (m = match(dir_pattern, dir)) !== nothing
                 label = match(r"N(\d+)", dir).captures[1]  # Extract label from the dirname
                 push!(dirs, (joinpath(dir, fname), "N$label"))
-                push!(xaxi, parse(Float64, label))
+                push!(xs, parse(Float64, label))
             end
         end
 
-        (dats_tmp, labs_tmp) = load_data(dirs, parent_dir)
-
-        push!(avgs, [xaxi, calc_avgs(dats_tmp, range)])
+        (dats, _) = load_data(dirs, parent_dir)
+        push!(avgs, [xs, calc_avgs(dats, range)])
     end
-    
+
     return (avgs, labs)
 end
 
