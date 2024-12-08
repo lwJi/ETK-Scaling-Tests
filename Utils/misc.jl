@@ -17,7 +17,7 @@ function load_data(
         "TotalComputeTime" =>
             r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
         "ZcsPerSecond" =>
-            r"average cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
+            r"Grid cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
     )
 
     # Get the appropriate pattern or throw an error for an invalid option
