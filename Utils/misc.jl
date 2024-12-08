@@ -132,20 +132,32 @@ function load_avgs(
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
         # Containers for matched directories and extracted values
-        dirs = Vector{Tuple{String,String}}()
-        xs = Vector{Float64}()
+        matched_dirs = Vector{Tuple{String,String}}()
+        x_values = Vector{Float64}()
 
         for dir in readdir(parent_dir; join = false)
             if (m = match(dir_pattern, dir)) !== nothing
-                label_value = parse(Float64, match(r"N(\d+)", dir).captures[1])
-                push!(dirs, (joinpath(dir, fname), "N$label_value"))
-                push!(xs, label_value)
+                # Extract "N" value
+                n_match = match(r"N(\d+)", dir)
+                @assert n_match !== nothing "Directory name must include an 'N' followed by a number"
+                n_value = parse(Float64, n_match.captures[1])
+
+                # Store directory and associated label
+                push!(matched_dirs, (joinpath(dir, fname), "N$n_value"))
+                push!(x_values, n_value)
             end
         end
 
         # Load data and compute averages if directories are found
-        (dats, _) = load_data(dirs, parent_dir, option)
-        push!(avgs, [xs, calc_avgs(dats, range, option)])
+        dats, _ = load_data(matched_dirs, parent_dir, option)
+        avgs_tmp = [x_values, calc_avgs(dats, range, option)]
+
+        # Sort by x_values and store the sorted averages
+        sorted_indices = sortperm(avgs_tmp[1])
+        sorted_avgs = [d[sorted_indices] for d in avgs_tmp]
+
+        # Save the avgs and the label
+        push!(avgs, sorted_avgs)
         push!(labs, label)
     end
 
