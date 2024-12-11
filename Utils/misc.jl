@@ -2,6 +2,7 @@ module Misc
 
 using DelimitedFiles
 using Statistics
+using Plots
 
 #############
 # load data #
@@ -162,6 +163,36 @@ function load_avgs(
     end
 
     return (avgs, labs)
+end
+
+# Plot scaling result
+function plot_scaling(
+    plt::Plots.Plot,
+    patt_dirss::Vector{Tuple{Vector{Tuple{Regex,String}},String,Symbol}};
+    option::String = "TotalComputeTime",
+    is_print_value::Bool = true,
+    is_plot_ideal::Bool = false,
+)
+    # Process datasets
+    for (patterns, parent_dir, mark) in patt_dirss
+        # Load averages for the given patterns and directory
+        (dats, labs) = load_avgs(patterns, parent_dir; option = option)
+
+        # Iterate through the loaded datasets
+        for (i, dat) in enumerate(dats)
+            plot!(plt, dat[1], dat[2], label = labs[i], marker = mark)
+            if is_print_value
+                println("$(labs[i]): ", dat[2])
+            end
+        end
+
+        ## Add the "ideal" reference plot
+        if (is_plot_ideal)
+            x_ref, y_ref = dats[end]  # choose the last dataset as the reference
+            ideal_y = y_ref[1] .* (x_ref ./ x_ref[1])  # compute the ideal scaling line
+            plot!(plt, x_ref, ideal_y; label = "ideal", linestyle = :dash, color = :red)
+        end
+    end
 end
 
 end
