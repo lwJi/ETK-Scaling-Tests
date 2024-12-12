@@ -223,7 +223,7 @@ function plot_scaling(
     plt::Plots.Plot,
     patt_dirss::Vector{Tuple{Vector{Tuple{Regex,String}},String,Symbol}};
     option::String = "TotalComputeTime",
-    is_print_value::Bool = true,
+    is_print_value::Bool = false,
     is_plot_ideal::Bool = false,
 )::Nothing
     @assert !isempty(patt_dirss) "The `patt_dirss` input cannot be empty."
