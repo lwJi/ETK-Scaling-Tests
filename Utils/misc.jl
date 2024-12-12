@@ -225,11 +225,16 @@ function plot_scaling(
     option::String = "TotalComputeTime",
     is_print_value::Bool = true,
     is_plot_ideal::Bool = false,
-)
+)::Nothing
+    @assert !isempty(patt_dirss) "The `patt_dirss` input cannot be empty."
+
     # Process datasets
     for (patterns, parent_dir, mark) in patt_dirss
+        @assert isdir(parent_dir) "Invalid directory: $parent_dir"
+
         # Load averages for the given patterns and directory
-        (dats, labs) = load_avgs(patterns, parent_dir; option = option)
+        dats, labs = load_avgs(patterns, parent_dir; option = option)
+        @assert !isempty(dats) "No data found for directory: $parent_dir"
 
         # Iterate through the loaded datasets
         for (i, dat) in enumerate(dats)
@@ -243,7 +248,7 @@ function plot_scaling(
         if (is_plot_ideal)
             x_ref, y_ref = dats[end]  # choose the last dataset as the reference
             ideal_y = y_ref[1] .* (x_ref ./ x_ref[1])  # compute the ideal scaling line
-            plot!(plt, x_ref, ideal_y; label = "ideal", linestyle = :dash, color = :red)
+            plot!(plt, x_ref, ideal_y; label = "Ideal", linestyle = :dash, color = :red)
         end
     end
 end
