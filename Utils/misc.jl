@@ -136,7 +136,7 @@ function get_matched_dirs(
 
     # Iterate through directories in the parent directory
     for dir in readdir(parent_dir; join = false)
-        if (m = match(dir_pattern, dir)) !== nothing
+        if (match(dir_pattern, dir)) !== nothing
             # Extract "N" value
             n_match = match(n_value_regex, dir)
             @assert n_match !== nothing "Directory name must include an 'N' followed by a number"
