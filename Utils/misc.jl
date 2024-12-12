@@ -3,6 +3,7 @@ module Misc
 using DelimitedFiles
 using Statistics
 using Plots
+using Printf
 
 #############
 # load data #
@@ -240,7 +241,11 @@ function plot_scaling(
         for (i, dat) in enumerate(dats)
             plot!(plt, dat[1], dat[2], label = labs[i], marker = mark)
             if is_print_value
-                println("$(labs[i]): ", dat[2])
+                @printf("  %8s: [", labs[i])
+                for d in dat[2]
+                    @printf(" %8.2e,", d)
+                end
+                @printf("]\n")
             end
         end
 
