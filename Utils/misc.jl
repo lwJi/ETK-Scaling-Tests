@@ -124,25 +124,42 @@ function get_matched_dirs(
     dir_pattern::Regex,
     fname::String,
 )::Tuple{Vector{Float64},Vector{Tuple{String,String}}}
+    # Validate input directory
+    @assert isdir(parent_dir) "Provided `parent_dir` is not a valid directory."
+
+    # Prepare outputs
     matched_dirs = Vector{Tuple{String,String}}()
     x_values = Vector{Float64}()
+
+    # Predefine regex for extracting "N" value
+    n_value_regex = r"N(\d+)"
+
+    # Iterate through directories in the parent directory
     for dir in readdir(parent_dir; join = false)
         if (m = match(dir_pattern, dir)) !== nothing
             # Extract "N" value
-            n_match = match(r"N(\d+)", dir)
+            n_match = match(n_value_regex, dir)
             @assert n_match !== nothing "Directory name must include an 'N' followed by a number"
+
+            # Parse the extracted value
             n_value = parse(Float64, n_match.captures[1])
 
+            # Construct the file path and label
+            dir_path = joinpath(dir, fname)
+            label = "N$n_value"
+
             # Store directory and associated label
-            push!(matched_dirs, (joinpath(dir, fname), "N$n_value"))
+            push!(matched_dirs, (dir_path, label))
             push!(x_values, n_value)
         end
     end
 
-    # Sort by x_values
+    # Sort by `x_values` and apply the same order to `matched_dirs`
     sorted_indices = sortperm(x_values)
+    sorted_x_values = x_values[sorted_indices]
+    sorted_matched_dirs = matched_dirs[sorted_indices]
 
-    return (x_values[sorted_indices], matched_dirs[sorted_indices])
+    return (sorted_x_values, sorted_matched_dirs)
 end
 
 # Function to load averages based on options
