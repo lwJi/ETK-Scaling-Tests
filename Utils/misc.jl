@@ -138,7 +138,11 @@ function get_matched_dirs(
             push!(x_values, n_value)
         end
     end
-    return (x_values, matched_dirs)
+
+    # Sort by x_values and store the sorted averages
+    sorted_indices = sortperm(x_values)
+
+    return (x_values[sorted_indices], matched_dirs[sorted_indices])
 end
 
 # Function to load averages based on options
@@ -162,45 +166,36 @@ function load_avgs(
         dats, _ = load_data(matched_dirs, parent_dir, option)
         avgs_tmp = [x_values, calc_avgs(dats, range, option)]
 
-        # Sort by x_values and store the sorted averages
-        sorted_indices = sortperm(avgs_tmp[1])
-        sorted_avgs = [d[sorted_indices] for d in avgs_tmp]
+        ## Sort by x_values and store the sorted averages
+        #sorted_indices = sortperm(avgs_tmp[1])
+        #sorted_avgs = [d[sorted_indices] for d in avgs_tmp]
 
         # Save the avgs and the label
-        push!(avgs, sorted_avgs)
+        push!(avgs, avgs_tmp)
         push!(labs, label)
     end
 
     return (avgs, labs)
 end
 
-# Function to load averages based on options
+# Function to load values based on options
 function load_values(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
     range = :,
     option::String = "TotalComputeTime",
     fname::String = "stdout.txt",
-)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
-    # Preallocate the dats container
-    vals = Vector{Vector{Vector{Float64}}}()
-    labs = Vector{String}()
+)
 
+    # Preallocate the dats container
+    vals = []
+    labs = []
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
         # Containers for matched directories and extracted values
-        x_values, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
-
-        # Load data and compute averages if directories are found
-        dats, _ = load_data(matched_dirs, parent_dir, option)
-        vals_tmp = [x_values, dats]
-
-        # Sort by x_values and store the sorted averages
-        sorted_indices = sortperm(vals_tmp[1])
-        sorted_vals = [d[sorted_indices] for d in vals_tmp]
-
+        _, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
         # Save the vals and the label
-        push!(vals, sorted_vals)
+        push!(vals, load_data(matched_dirs, parent_dir, option))
         push!(labs, label)
     end
 
