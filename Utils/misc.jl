@@ -174,6 +174,39 @@ function load_avgs(
     return (avgs, labs)
 end
 
+# Function to load averages based on options
+function load_values(
+    dir_patterns::Vector{Tuple{Regex,String}},
+    parent_dir::String;
+    range = :,
+    option::String = "TotalComputeTime",
+    fname::String = "stdout.txt",
+)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
+    # Preallocate the dats container
+    vals = Vector{Vector{Vector{Float64}}}()
+    labs = Vector{String}()
+
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Containers for matched directories and extracted values
+        x_values, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data and compute averages if directories are found
+        dats, _ = load_data(matched_dirs, parent_dir, option)
+        vals_tmp = [x_values, dats]
+
+        # Sort by x_values and store the sorted averages
+        sorted_indices = sortperm(vals_tmp[1])
+        sorted_vals = [d[sorted_indices] for d in vals_tmp]
+
+        # Save the vals and the label
+        push!(vals, sorted_vals)
+        push!(labs, label)
+    end
+
+    return (vals, labs)
+end
+
 # Plot scaling result
 function plot_scaling(
     plt::Plots.Plot,
