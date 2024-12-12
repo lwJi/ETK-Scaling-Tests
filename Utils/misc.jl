@@ -139,7 +139,7 @@ function get_matched_dirs(
         end
     end
 
-    # Sort by x_values and store the sorted averages
+    # Sort by x_values
     sorted_indices = sortperm(x_values)
 
     return (x_values[sorted_indices], matched_dirs[sorted_indices])
@@ -164,14 +164,9 @@ function load_avgs(
 
         # Load data and compute averages if directories are found
         dats, _ = load_data(matched_dirs, parent_dir, option)
-        avgs_tmp = [x_values, calc_avgs(dats, range, option)]
-
-        ## Sort by x_values and store the sorted averages
-        #sorted_indices = sortperm(avgs_tmp[1])
-        #sorted_avgs = [d[sorted_indices] for d in avgs_tmp]
 
         # Save the avgs and the label
-        push!(avgs, avgs_tmp)
+        push!(avgs, [x_values, calc_avgs(dats, range, option)])
         push!(labs, label)
     end
 
