@@ -197,17 +197,21 @@ function load_values(
     range = :,
     option::String = "TotalComputeTime",
     fname::String = "stdout.txt",
-)
-
+)::Tuple{Vector{Any},Vector{String}}
     # Preallocate the dats container
-    vals = []
-    labs = []
+    vals = Vector{Any}()
+    labs = Vector{String}()
+
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
-        # Containers for matched directories and extracted values
+        # Extract matched directories
         _, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data for matched directories
+        data = load_data(matched_dirs, parent_dir, option)
+
         # Save the vals and the label
-        push!(vals, load_data(matched_dirs, parent_dir, option))
+        push!(vals, data)
         push!(labs, label)
     end
 
