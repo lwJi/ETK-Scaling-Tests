@@ -4,8 +4,8 @@ using DelimitedFiles
 
 # Load data from dirs
 #   dirs:   [
-#             ("Z4c_L7_G64-N2-MPI16_r0000", "G64-N2-MPI16"),
-#             ("Z4c_L7_G128-N2-MPI16_r0000", "G128-N2-MPI16"),
+#             ("Z4c_L7_G128-N2-MPI16_r0000", "N2"),
+#             ("Z4c_L7_G128-N4-MPI32_r0000", "N4"),
 #           ]
 #   return: (
 #             [
@@ -13,8 +13,8 @@ using DelimitedFiles
 #               [[ ...       ], [ ...       ], [ ...        ], ...],
 #             ],
 #             [
-#               "G64-N2-MPI16",
-#               "G128-N2-MPI16",
+#               "N2",
+#               "N4",
 #             ]
 #           )
 function load_data(

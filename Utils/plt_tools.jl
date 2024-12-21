@@ -15,10 +15,13 @@ using Printf
 function load_values(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
-    range = :,
     option::String = "TotalComputeTime",
     fname::String = "stdout.txt",
 )::Tuple{Vector{Any},Vector{String}}
+    # Validate inputs
+    @assert isdir(parent_dir) "Provided `parent_dir` is not a valid directory."
+    @assert !isempty(dir_patterns) "Provided `dir_patterns` cannot be empty."
+
     # Preallocate the dats container
     vals = Vector{Any}()
     labs = Vector{String}()
