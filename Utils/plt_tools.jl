@@ -1,5 +1,7 @@
 module PltTools
 
+include("load_data.jl")
+
 using DelimitedFiles
 using Statistics
 using Plots
@@ -61,10 +63,10 @@ function load_avgs(
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
         # Containers for matched directories and extracted values
-        x_values, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+        x_values, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
 
         # Load data and compute averages if directories are found
-        dats, _ = load_data(matched_dirs, parent_dir, option)
+        dats, _ = LoadData.load_data(matched_dirs, parent_dir, option)
 
         # Save the avgs and the label
         push!(avgs, [x_values, calc_avgs(dats, range, option)])
@@ -89,10 +91,10 @@ function load_values(
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
         # Extract matched directories
-        _, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+        _, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
 
         # Load data for matched directories
-        data = load_data(matched_dirs, parent_dir, option)
+        data = LoadData.load_data(matched_dirs, parent_dir, option)
 
         # Save the vals and the label
         push!(vals, data)
