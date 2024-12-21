@@ -24,7 +24,7 @@ using Printf
 #                       [                                                        |
 #                         [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
 #                         [[ ...       ], [ ...       ], [ ...        ], ...],   |
-#                       ],                                                       |--> returned from load_data()
+#                       ],                                                       |--> returned by load_data()
 #                       [                                                        |
 #                         "N2",                                                  |
 #                         "N4",                                                  |
