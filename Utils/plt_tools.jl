@@ -121,6 +121,16 @@ function load_avgs(
 end
 
 # Function to calculate averages for a given dataset
+#   dats:   [                                                      --
+#             [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
+#             [[ ...       ], [ ...       ], [ ...        ], ...],   |--> first slot of load_data()'s return
+#             ...,                                                   |
+#           ],                                                     --
+#   return: [
+#             avg1,
+#             avg2,
+#             ...,
+#           ]
 function calc_avgs(
     dats::Vector{Vector{Vector{Float64}}},
     range,
