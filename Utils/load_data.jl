@@ -128,10 +128,8 @@ function get_matched_dirs(
 
     # Sort by `x_values` and apply the same order to `matched_dirs`
     sorted_indices = sortperm(x_values)
-    sorted_x_values = x_values[sorted_indices]
-    sorted_matched_dirs = matched_dirs[sorted_indices]
 
-    return (sorted_x_values, sorted_matched_dirs)
+    return (x_values[sorted_indices], matched_dirs[sorted_indices])
 end
 
 end
