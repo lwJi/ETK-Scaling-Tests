@@ -91,6 +91,17 @@ function load_data(
 end
 
 # Return matched directories and extracted values
+#   dir_pattern: r"Z4c_L7_G256-N\d+-MPI\d+_r0000"
+#   fname:       "stdout.txt"
+#   return:      (
+#                  [ 2, 4, 6, ...],
+#                  [
+#                    ("Z4c_L7_G256_N2_MPI16_r0000/stdout.txt", "N2"),
+#                    ("Z4c_L7_G256_N4_MPI32_r0000/stdout.txt", "N4"),
+#                    ("Z4c_L7_G256_N8_MPI64_r0000/stdout.txt", "N8"),
+#                    ...,
+#                  ],
+#                )
 function get_matched_dirs(
     parent_dir::String,
     dir_pattern::Regex,
