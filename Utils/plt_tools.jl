@@ -12,6 +12,33 @@ using Printf
 ###################################
 
 # Function to load values based on options
+#   dir_patterns: [
+#                   (r"Z4c_L7_G256-N\d+-MPI\d+_r0000", "G256"),
+#                   (r"Z4c_L7_G128-N\d+-MPI\d+_r0000", "G128"),
+#                   ...,
+#                 ]
+#   fname:        "stdout.txt"
+#   return:       (
+#                   [
+#                     (                                                        --
+#                       [                                                        |
+#                         [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
+#                         [[ ...       ], [ ...       ], [ ...        ], ...],   |
+#                       ],                                                       |--> returned from load_data()
+#                       [                                                        |
+#                         "N2",                                                  |
+#                         "N4",                                                  |
+#                       ]                                                        |
+#                     ),                                                       --
+#                     (),
+#                     ...,
+#                   ],
+#                   [
+#                     "G256",
+#                     "G128",
+#                     ...,
+#                   ]
+#                 )
 function load_values(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
