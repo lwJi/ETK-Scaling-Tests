@@ -69,6 +69,34 @@ function load_values(
     return (vals, labs)
 end
 
+# Function to load averages based on options
+function load_avgs(
+    dir_patterns::Vector{Tuple{Regex,String}},
+    parent_dir::String;
+    range = :,
+    option::String = "TotalComputeTime",
+    fname::String = "stdout.txt",
+)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
+    # Preallocate the dats container
+    avgs = Vector{Vector{Vector{Float64}}}()
+    labs = Vector{String}()
+
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Containers for matched directories and extracted values
+        x_values, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data and compute averages if directories are found
+        dats, _ = LoadData.load_data(matched_dirs, parent_dir, option)
+
+        # Save the avgs and the label
+        push!(avgs, [x_values, calc_avgs(dats, range, option)])
+        push!(labs, label)
+    end
+
+    return (avgs, labs)
+end
+
 # Function to calculate averages for a given dataset
 function calc_avgs(
     dats::Vector{Vector{Vector{Float64}}},
@@ -104,34 +132,6 @@ function calc_avgs(
     end
 
     return avgs
-end
-
-# Function to load averages based on options
-function load_avgs(
-    dir_patterns::Vector{Tuple{Regex,String}},
-    parent_dir::String;
-    range = :,
-    option::String = "TotalComputeTime",
-    fname::String = "stdout.txt",
-)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
-    # Preallocate the dats container
-    avgs = Vector{Vector{Vector{Float64}}}()
-    labs = Vector{String}()
-
-    # Process each directory pattern
-    for (dir_pattern, label) in dir_patterns
-        # Containers for matched directories and extracted values
-        x_values, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
-
-        # Load data and compute averages if directories are found
-        dats, _ = LoadData.load_data(matched_dirs, parent_dir, option)
-
-        # Save the avgs and the label
-        push!(avgs, [x_values, calc_avgs(dats, range, option)])
-        push!(labs, label)
-    end
-
-    return (avgs, labs)
 end
 
 ##################
