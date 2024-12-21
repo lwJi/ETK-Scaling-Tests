@@ -28,7 +28,7 @@ function load_data(
 
     # Preallocate the dats container
     dats = Vector{Vector{Vector{Float64}}}()
-    labs = [label for (_, label) in dirs]      # Extract labels
+    labs = [label for (_, label) in dirs]  # Extract labels
 
     for (subdir, _) in dirs
         file_path = joinpath(parent_dir, subdir)
