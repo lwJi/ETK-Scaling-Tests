@@ -5,6 +5,10 @@ using Statistics
 using Plots
 using Printf
 
+###################################
+# Tool functions for loading data #
+###################################
+
 # Function to calculate averages for a given dataset
 function calc_avgs(
     dats::Vector{Vector{Vector{Float64}}},
@@ -97,6 +101,10 @@ function load_values(
 
     return (vals, labs)
 end
+
+##################
+# Plot functions #
+##################
 
 # Plot scaling result
 function plot_scaling(
