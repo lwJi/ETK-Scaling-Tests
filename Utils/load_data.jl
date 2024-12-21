@@ -2,6 +2,21 @@ module LoadData
 
 using DelimitedFiles
 
+# Load data from dirs
+#   dirs:   [
+#             ("Z4c_L7_G64-N2-MPI16_r0000", "G64-N2-MPI16"),
+#             ("Z4c_L7_G128-N2-MPI16_r0000", "G128-N2-MPI16"),
+#           ]
+#   return: (
+#             [
+#               [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],
+#               [[ ...       ], [ ...       ], [ ...        ], ...],
+#             ],
+#             [
+#               "G64-N2-MPI16",
+#               "G128-N2-MPI16",
+#             ]
+#           )
 function load_data(
     dirs::Vector{Tuple{String,String}},
     parent_dir::String,
