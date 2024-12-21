@@ -70,6 +70,25 @@ function load_values(
 end
 
 # Function to load averages based on options
+#   dir_patterns: [
+#                   (r"Z4c_L7_G256-N\d+-MPI\d+_r0000", "G256"),
+#                   (r"Z4c_L7_G128-N\d+-MPI\d+_r0000", "G128"),
+#                   ...,
+#                 ]
+#   fname:        "stdout.txt"
+#   return:       (
+#                   [
+#                     [ [2, 4, 8, ...], [avg2, avg4, avg8, ...] ],
+#                     [],
+#                     ...,
+#                   ],
+#                   ,
+#                   [
+#                     "G256",
+#                     "G128",
+#                     ...,
+#                   ]
+#                 )
 function load_avgs(
     dir_patterns::Vector{Tuple{Regex,String}},
     parent_dir::String;
