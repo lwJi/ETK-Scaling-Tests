@@ -1,4 +1,4 @@
-module Misc
+module PltTools
 
 using DelimitedFiles
 using Statistics
