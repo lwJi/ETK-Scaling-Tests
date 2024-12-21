@@ -96,16 +96,20 @@ function load_avgs(
     option::String = "TotalComputeTime",
     fname::String = "stdout.txt",
 )::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
+    # Validate inputs
+    @assert isdir(parent_dir) "Provided `parent_dir` is not a valid directory."
+    @assert !isempty(dir_patterns) "Provided `dir_patterns` cannot be empty."
+
     # Preallocate the dats container
     avgs = Vector{Vector{Vector{Float64}}}()
     labs = Vector{String}()
 
     # Process each directory pattern
     for (dir_pattern, label) in dir_patterns
-        # Containers for matched directories and extracted values
+        # Extract matched directories and their associated x_values
         x_values, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
 
-        # Load data and compute averages if directories are found
+        # Load data for the matched directories
         dats, _ = LoadData.load_data(matched_dirs, parent_dir, option)
 
         # Save the avgs and the label
