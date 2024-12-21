@@ -11,6 +11,34 @@ using Printf
 # Tool functions for loading data #
 ###################################
 
+# Function to load values based on options
+function load_values(
+    dir_patterns::Vector{Tuple{Regex,String}},
+    parent_dir::String;
+    range = :,
+    option::String = "TotalComputeTime",
+    fname::String = "stdout.txt",
+)::Tuple{Vector{Any},Vector{String}}
+    # Preallocate the dats container
+    vals = Vector{Any}()
+    labs = Vector{String}()
+
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Extract matched directories
+        _, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data for matched directories
+        data = LoadData.load_data(matched_dirs, parent_dir, option)
+
+        # Save the vals and the label
+        push!(vals, data)
+        push!(labs, label)
+    end
+
+    return (vals, labs)
+end
+
 # Function to calculate averages for a given dataset
 function calc_avgs(
     dats::Vector{Vector{Vector{Float64}}},
@@ -74,34 +102,6 @@ function load_avgs(
     end
 
     return (avgs, labs)
-end
-
-# Function to load values based on options
-function load_values(
-    dir_patterns::Vector{Tuple{Regex,String}},
-    parent_dir::String;
-    range = :,
-    option::String = "TotalComputeTime",
-    fname::String = "stdout.txt",
-)::Tuple{Vector{Any},Vector{String}}
-    # Preallocate the dats container
-    vals = Vector{Any}()
-    labs = Vector{String}()
-
-    # Process each directory pattern
-    for (dir_pattern, label) in dir_patterns
-        # Extract matched directories
-        _, matched_dirs = LoadData.get_matched_dirs(parent_dir, dir_pattern, fname)
-
-        # Load data for matched directories
-        data = LoadData.load_data(matched_dirs, parent_dir, option)
-
-        # Save the vals and the label
-        push!(vals, data)
-        push!(labs, label)
-    end
-
-    return (vals, labs)
 end
 
 ##################
