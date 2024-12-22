@@ -144,7 +144,7 @@ function calc_avgs(
         "TotalComputeTime" =>
             (_, t, _, v) -> seconds_per_day * ((t[end] - t[1]) / (v[end] - v[1])),
         "ZcsPerSecond" => (_, _, _, v) -> mean(v),
-        "ZcsPerSecond2" => (_, t, c, _) -> sum(c[2:end]) / (t[end] - t[1]),
+        "ZcsPerSecond2" => (_, _, c, v) -> sum(c[2:end]) / (v[end] - v[1]),
     )
 
     # Validate the option and retrieve the corresponding calculation function
