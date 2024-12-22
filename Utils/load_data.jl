@@ -53,8 +53,8 @@ function load_data(
         # Initialize containers for matched data
         steps = Float64[]
         times = Float64[]
-        custom_matches = Float64[]
         cells = Float64[]
+        custom_matches = Float64[]
 
         # Attempt to read the file
         lines = try
@@ -66,28 +66,28 @@ function load_data(
 
         # Process each line in the file
         for line in lines
-            # Match and parse simulation time
-            if (m_time = match(time_pattern, line)) !== nothing
-                push!(times, parse(Float64, m_time.captures[1]))
-            end
             # Match and parse total iterations
             if (m_step = match(step_pattern, line)) !== nothing
                 push!(steps, parse(Float64, m_step.captures[1]))
             end
-            # Match and parse custom pattern
-            if (m_custom = match(pattern, line)) !== nothing
-                push!(custom_matches, parse(Float64, m_custom.captures[1]))
+            # Match and parse simulation time
+            if (m_time = match(time_pattern, line)) !== nothing
+                push!(times, parse(Float64, m_time.captures[1]))
             end
             # Match and parse total cells
             if (m_cell = match(cell_pattern, line)) !== nothing
                 push!(cells, parse(Float64, m_cell.captures[1]))
             end
+            # Match and parse custom pattern
+            if (m_custom = match(pattern, line)) !== nothing
+                push!(custom_matches, parse(Float64, m_custom.captures[1]))
+            end
         end
 
         # Ensure arrays are synchronized to the minimum length
-        min_len = minimum([length(steps), length(times), length(custom_matches), length(cells)])
+        min_len = minimum([length(steps), length(times), length(cells), length(custom_matches)])
         if min_len > 0
-            push!(dats, [steps[1:min_len], times[1:min_len], custom_matches[1:min_len], cells[1:min_len]])
+            push!(dats, [steps[1:min_len], times[1:min_len], cells[1:min_len], custom_matches[1:min_len]])
         else
             println("Warning: No valid data found in file $file_path.")
             push!(dats, [Float64[], Float64[], Float64[], Float64[]])
