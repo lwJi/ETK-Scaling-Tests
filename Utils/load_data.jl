@@ -40,8 +40,7 @@ function load_data(
         r"\(CarpetX\):   total iterations:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
     time_pattern =
         r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
-    cell_pattern =
-        r"\(CarpetX\): Grid cells:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
+    cell_pattern = r"\(CarpetX\): Grid cells:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
 
     # Preallocate the dats container
     dats = Vector{Vector{Vector{Float64}}}()
@@ -85,9 +84,18 @@ function load_data(
         end
 
         # Ensure arrays are synchronized to the minimum length
-        min_len = minimum([length(steps), length(times), length(cells), length(custom_matches)])
+        min_len =
+            minimum([length(steps), length(times), length(cells), length(custom_matches)])
         if min_len > 0
-            push!(dats, [steps[1:min_len], times[1:min_len], cells[1:min_len], custom_matches[1:min_len]])
+            push!(
+                dats,
+                [
+                    steps[1:min_len],
+                    times[1:min_len],
+                    cells[1:min_len],
+                    custom_matches[1:min_len],
+                ],
+            )
         else
             println("Warning: No valid data found in file $file_path.")
             push!(dats, [Float64[], Float64[], Float64[], Float64[]])

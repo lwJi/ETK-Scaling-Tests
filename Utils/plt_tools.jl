@@ -142,13 +142,16 @@ function calc_avgs(
     # Define calculations for each option using a dictionary
     option_calculations = Dict(
         "TotalComputeTime" =>
-            (x, y) -> seconds_per_day * ((x[end] - x[1]) / (y[end] - y[1])),
-        "ZcsPerSecond" => (_, y) -> mean(y),
+            (_, t, _, v) -> seconds_per_day * ((t[end] - t[1]) / (v[end] - v[1])),
+        "ZcsPerSecond" => (_, _, _, v) -> mean(v),
+        "ZcsPerSecond2" => (_, t, c, _) -> sum(c[2:end]) / (t[end] - t[1]),
     )
 
     # Validate the option and retrieve the corresponding calculation function
     calc_fn = get(option_calculations, option) do
-        error("Invalid option: '$option'. Valid options are: $(join(keys(option_calculations), ", ")).")
+        error(
+            "Invalid option: '$option'. Valid options are: $(join(keys(option_calculations), ", ")).",
+        )
     end
 
     # Preallocate results
@@ -160,11 +163,13 @@ function calc_avgs(
         @assert length(dat) >= 3 "Dataset at index $i does not contain enough data (expected at least 3 entries)."
 
         # Extract time and value data for the given range
-        x = dat[2][range]
-        y = dat[3][range]
+        steps = dat[1][range]
+        times = dat[2][range]
+        cells = dat[3][range]
+        values = dat[4][range]
 
         # Perform the calculation and store the result
-        avgs[i] = calc_fn(x, y)
+        avgs[i] = calc_fn(steps, times, cells, values)
     end
 
     return avgs
