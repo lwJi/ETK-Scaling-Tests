@@ -2,6 +2,10 @@ module LoadData
 
 using DelimitedFiles
 
+##########################
+# Basic loading function #
+##########################
+
 # Load data from dirs
 #   dirs:   [
 #             ("Z4c_L7_G128-N2-MPI16_r0000", "N2"),
@@ -158,6 +162,177 @@ function get_matched_dirs(
     sorted_indices = sortperm(x_values)
 
     return (x_values[sorted_indices], matched_dirs[sorted_indices])
+end
+
+
+
+
+######################################
+# Wrapper functions for loading data #
+######################################
+
+# Function to load values based on options
+#   dir_patterns: [
+#                   (r"Z4c_L7_G256-N\d+-MPI\d+_r0000", "G256"),
+#                   (r"Z4c_L7_G128-N\d+-MPI\d+_r0000", "G128"),
+#                   ...,
+#                 ]
+#   fname:        "stdout.txt"
+#   return:       (
+#                   [
+#                     (                                                        --
+#                       [                                                        |
+#                         [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
+#                         [[ ...       ], [ ...       ], [ ...        ], ...],   |
+#                       ],                                                       |--> returned by load_data()
+#                       [                                                        |
+#                         "N2",                                                  |
+#                         "N4",                                                  |
+#                       ]                                                        |
+#                     ),                                                       --
+#                     (),
+#                     ...,
+#                   ],
+#                   [
+#                     "G256",
+#                     "G128",
+#                     ...,
+#                   ]
+#                 )
+function load_values(
+    dir_patterns::Vector{Tuple{Regex,String}},
+    parent_dir::String;
+    option::String = "TotalComputeTime",
+    fname::String = "stdout.txt",
+)::Tuple{Vector{Any},Vector{String}}
+    # Validate inputs
+    @assert isdir(parent_dir) "Provided `parent_dir` is not a valid directory."
+    @assert !isempty(dir_patterns) "Provided `dir_patterns` cannot be empty."
+
+    # Preallocate the dats container
+    vals = Vector{Any}()
+    labs = Vector{String}()
+
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Extract matched directories
+        _, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data for matched directories
+        data = load_data(matched_dirs, parent_dir, option)
+
+        # Save the vals and the label
+        push!(vals, data)
+        push!(labs, label)
+    end
+
+    return (vals, labs)
+end
+
+# Function to load averages based on options
+#   dir_patterns: [
+#                   (r"Z4c_L7_G256-N\d+-MPI\d+_r0000", "G256"),
+#                   (r"Z4c_L7_G128-N\d+-MPI\d+_r0000", "G128"),
+#                   ...,
+#                 ]
+#   fname:        "stdout.txt"
+#   return:       (
+#                   [
+#                     [ [2, 4, 8, ...], [avg2, avg4, avg8, ...] ],
+#                     [ [ ...        ], [ ...                 ] ],
+#                     ...,
+#                   ],
+#                   ,
+#                   [
+#                     "G256",
+#                     "G128",
+#                     ...,
+#                   ]
+#                 )
+function load_avgs(
+    dir_patterns::Vector{Tuple{Regex,String}},
+    parent_dir::String;
+    range = :,
+    option::String = "TotalComputeTime",
+    fname::String = "stdout.txt",
+)::Tuple{Vector{Vector{Vector{Float64}}},Vector{String}}
+    # Validate inputs
+    @assert isdir(parent_dir) "Provided `parent_dir` is not a valid directory."
+    @assert !isempty(dir_patterns) "Provided `dir_patterns` cannot be empty."
+
+    # Preallocate the dats container
+    avgs = Vector{Vector{Vector{Float64}}}()
+    labs = Vector{String}()
+
+    # Process each directory pattern
+    for (dir_pattern, label) in dir_patterns
+        # Extract matched directories and their associated x_values
+        x_values, matched_dirs = get_matched_dirs(parent_dir, dir_pattern, fname)
+
+        # Load data for the matched directories
+        dats, _ = load_data(matched_dirs, parent_dir, option)
+
+        # Save the avgs and the label
+        push!(avgs, [x_values, calc_avgs(dats, range, option)])
+        push!(labs, label)
+    end
+
+    return (avgs, labs)
+end
+
+# Function to calculate averages for a given dataset
+#   dats:   [                                                      --
+#             [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
+#             [[ ...       ], [ ...       ], [ ...        ], ...],   |--> first slot of load_data()'s return
+#             ...,                                                   |
+#           ],                                                     --
+#   return: [
+#             avg1,
+#             avg2,
+#             ...,
+#           ]
+function calc_avgs(
+    dats::Vector{Vector{Vector{Float64}}},
+    range,
+    option::String,
+)::Vector{Float64}
+    # Constants for conversions
+    seconds_per_day = 3600 * 24
+
+    # Define calculations for each option using a dictionary
+    option_calculations = Dict(
+        "TotalComputeTime" =>
+            (_, t, _, v) -> seconds_per_day * ((t[end] - t[1]) / (v[end] - v[1])),
+        "ZcsPerSecond2" => (_, _, c, v) -> sum(c[2:end]) / (v[end] - v[1]),
+        "ZcsPerSecond" => (_, _, _, v) -> mean(v),
+    )
+
+    # Validate the option and retrieve the corresponding calculation function
+    calc_fn = get(option_calculations, option) do
+        error(
+            "Invalid option: '$option'. Valid options are: $(join(keys(option_calculations), ", ")).",
+        )
+    end
+
+    # Preallocate results
+    avgs = Vector{Float64}(undef, length(dats))
+
+    # Process each dataset
+    for (i, dat) in enumerate(dats)
+        # Ensure the dataset has enough data
+        @assert length(dat) >= 3 "Dataset at index $i does not contain enough data (expected at least 3 entries)."
+
+        # Extract time and value data for the given range
+        steps = dat[1][range]
+        times = dat[2][range]
+        cells = dat[3][range]
+        values = dat[4][range]
+
+        # Perform the calculation and store the result
+        avgs[i] = calc_fn(steps, times, cells, values)
+    end
+
+    return avgs
 end
 
 end
