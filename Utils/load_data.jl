@@ -26,7 +26,7 @@ function load_data(
     patterns = Dict(
         "TotalComputeTime" =>
             r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
-        "ZcsPerSecond2" =>
+        "ZcsPerSecond2" =>  # we recalculate ZcsPerSecond using total evolution compute time here
             r"total evolution compute time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",
         "ZcsPerSecond" =>
             r"Grid cell updates per second:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)",

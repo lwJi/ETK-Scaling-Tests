@@ -143,8 +143,8 @@ function calc_avgs(
     option_calculations = Dict(
         "TotalComputeTime" =>
             (_, t, _, v) -> seconds_per_day * ((t[end] - t[1]) / (v[end] - v[1])),
-        "ZcsPerSecond" => (_, _, _, v) -> mean(v),
         "ZcsPerSecond2" => (_, _, c, v) -> sum(c[2:end]) / (v[end] - v[1]),
+        "ZcsPerSecond" => (_, _, _, v) -> mean(v),
     )
 
     # Validate the option and retrieve the corresponding calculation function
