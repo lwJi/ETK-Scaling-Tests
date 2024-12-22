@@ -280,6 +280,13 @@ function load_avgs(
     return (avgs, labs)
 end
 
+
+
+
+##################
+# Tool functions #
+##################
+
 # Function to calculate averages for a given dataset
 #   dats:   [                                                      --
 #             [[x1,x2,x3...], [y1,y2,y3...], [z1,z2,z3,...], ...],   |
