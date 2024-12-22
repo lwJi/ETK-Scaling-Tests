@@ -136,19 +136,19 @@ function calc_avgs(
     range,
     option::String,
 )::Vector{Float64}
-    # Define constants for conversions
-    secs_per_day = 3600 * 24
+    # Constants for conversions
+    const SECONDS_PER_DAY = 3600 * 24
 
     # Define calculations for each option using a dictionary
     option_calculations = Dict(
         "TotalComputeTime" =>
-            (x, y) -> secs_per_day * ((x[end] - x[1]) / (y[end] - y[1])),
+            (x, y) -> SECONDS_PER_DAY * ((x[end] - x[1]) / (y[end] - y[1])),
         "ZcsPerSecond" => (_, y) -> mean(y),
     )
 
-    # Check for valid option
+    # Validate the option and retrieve the corresponding calculation function
     calc_fn = get(option_calculations, option) do
-        error("Invalid option: $option. Valid options are: $(keys(option_calculations)).")
+        error("Invalid option: '$option'. Valid options are: $(join(keys(option_calculations), ", ")).")
     end
 
     # Preallocate results
@@ -156,11 +156,14 @@ function calc_avgs(
 
     # Process each dataset
     for (i, dat) in enumerate(dats)
+        # Ensure the dataset has enough data
+        @assert length(dat) >= 3 "Dataset at index $i does not contain enough data (expected at least 3 entries)."
+
         # Extract time and value data for the given range
         x = dat[2][range]
         y = dat[3][range]
 
-        # Perform the calculation
+        # Perform the calculation and store the result
         avgs[i] = calc_fn(x, y)
     end
 
