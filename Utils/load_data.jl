@@ -36,10 +36,12 @@ function load_data(
     end
 
     # Precompile regex patterns for better performance
-    time_pattern =
-        r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
     step_pattern =
         r"\(CarpetX\):   total iterations:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
+    time_pattern =
+        r"\(CarpetX\): Simulation time:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
+    cell_pattern =
+        r"\(CarpetX\): Grid cells:\s+([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)"
 
     # Preallocate the dats container
     dats = Vector{Vector{Vector{Float64}}}()
@@ -52,6 +54,7 @@ function load_data(
         steps = Float64[]
         times = Float64[]
         custom_matches = Float64[]
+        cells = Float64[]
 
         # Attempt to read the file
         lines = try
@@ -75,15 +78,19 @@ function load_data(
             if (m_custom = match(pattern, line)) !== nothing
                 push!(custom_matches, parse(Float64, m_custom.captures[1]))
             end
+            # Match and parse total cells
+            if (m_cell = match(cell_pattern, line)) !== nothing
+                push!(cells, parse(Float64, m_cell.captures[1]))
+            end
         end
 
         # Ensure arrays are synchronized to the minimum length
-        min_len = minimum([length(steps), length(times), length(custom_matches)])
+        min_len = minimum([length(steps), length(times), length(custom_matches), length(cells)])
         if min_len > 0
-            push!(dats, [steps[1:min_len], times[1:min_len], custom_matches[1:min_len]])
+            push!(dats, [steps[1:min_len], times[1:min_len], custom_matches[1:min_len], cells[1:min_len]])
         else
             println("Warning: No valid data found in file $file_path.")
-            push!(dats, [Float64[], Float64[], Float64[]])
+            push!(dats, [Float64[], Float64[], Float64[], Float64[]])
         end
     end
 
