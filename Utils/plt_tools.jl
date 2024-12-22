@@ -137,12 +137,12 @@ function calc_avgs(
     option::String,
 )::Vector{Float64}
     # Constants for conversions
-    const SECONDS_PER_DAY = 3600 * 24
+    seconds_per_day = 3600 * 24
 
     # Define calculations for each option using a dictionary
     option_calculations = Dict(
         "TotalComputeTime" =>
-            (x, y) -> SECONDS_PER_DAY * ((x[end] - x[1]) / (y[end] - y[1])),
+            (x, y) -> seconds_per_day * ((x[end] - x[1]) / (y[end] - y[1])),
         "ZcsPerSecond" => (_, y) -> mean(y),
     )
 
