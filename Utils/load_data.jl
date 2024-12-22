@@ -1,6 +1,7 @@
 module LoadData
 
 using DelimitedFiles
+using Statistics
 
 ##########################
 # Basic loading function #

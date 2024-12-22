@@ -3,7 +3,6 @@ module PltTools
 include("load_data.jl")
 
 using DelimitedFiles
-using Statistics
 using Plots
 using Printf
 
