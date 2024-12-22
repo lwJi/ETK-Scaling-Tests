@@ -26,7 +26,7 @@ function plot_scaling(
         @assert isdir(parent_dir) "Invalid directory: $parent_dir"
 
         # Load averages for the given patterns and directory
-        dats, labs = load_avgs(patterns, parent_dir; option = option)
+        dats, labs = LoadData.load_avgs(patterns, parent_dir; option = option)
         @assert !isempty(dats) "No data found for directory: $parent_dir"
 
         # Iterate through the loaded datasets
@@ -62,7 +62,7 @@ function plot_efficiency(
         @assert isdir(parent_dir) "Invalid directory: $parent_dir"
 
         # Load averages for the given patterns and directory
-        dats, labs = load_avgs(patterns, parent_dir; option = option)
+        dats, labs = LoadData.load_avgs(patterns, parent_dir; option = option)
         @assert !isempty(dats) "No data found for directory: $parent_dir"
 
         # Iterate through the loaded datasets
