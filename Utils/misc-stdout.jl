@@ -1,4 +1,4 @@
-module LoadData
+module MiscStdout
 
 using DelimitedFiles
 using Statistics
