@@ -1,0 +1,160 @@
+###############################
+# Simple test of magnetised TOV neutron star
+# Same neutron star as the gallery example
+# K=100, rho_c = 1.28e-3 => M = 1.4, M_b = 1.506
+# evolve for t = 48.82 M
+##############################
+ActiveThorns = "
+    ADMBaseX
+    BoxInBox
+    CarpetX
+    Cowling
+    HydroBaseX
+    ODESolvers
+    TmunuBaseX
+    AsterX
+    AsterSeeds
+    #Z4cowGPU
+"
+
+$nlevels = 7
+$itlast  = 128
+
+CarpetX::ncells_x = 256
+CarpetX::ncells_y = 256
+CarpetX::ncells_z = 16384
+
+CarpetX::max_grid_size_x = 128
+CarpetX::max_grid_size_y = 128
+CarpetX::max_grid_size_z = 128
+
+CarpetX::blocking_factor_x = 8
+CarpetX::blocking_factor_y = 8
+CarpetX::blocking_factor_z = 8
+
+CarpetX::max_tile_size_x = 1024000
+CarpetX::max_tile_size_y = 1024000
+CarpetX::max_tile_size_z = 1024000
+
+Cactus::terminate = "iteration"
+Cactus::cctk_itlast = $itlast
+Cactus::presync_mode = "mixed-error"
+
+CarpetX::verbose = no
+CarpetX::poison_undefined_values = no
+
+CarpetX::use_subcycling_wip = yes
+CarpetX::restrict_during_sync = no
+
+CarpetX::xmin = -1024.0
+CarpetX::ymin = -1024.0
+CarpetX::zmin = -1024.0
+CarpetX::xmax = 1024.0 
+CarpetX::ymax = 1024.0
+CarpetX::zmax = 1024.0
+
+CarpetX::boundary_x = "neumann"
+CarpetX::boundary_y = "neumann"
+CarpetX::boundary_z = "neumann"
+CarpetX::boundary_upper_x = "neumann"
+CarpetX::boundary_upper_y = "neumann"
+CarpetX::boundary_upper_z = "neumann"
+
+CarpetX::max_num_levels = $nlevels
+CarpetX::regrid_every = 100000
+CarpetX::regrid_error_threshold = 5.0e-5
+
+CarpetX::prolongation_type = "ddf"
+CarpetX::ghost_size = 3
+CarpetX::dtfac = 0.4
+
+ODESolvers::verbose = no
+ODESolvers::method = "RK4"
+
+BoxInBox::num_regions = 1
+# Region 1
+BoxInBox::shape_1 = "cube"
+BoxInBox::num_levels_1 = $nlevels 
+BoxInBox::radius_1 = [ -1.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0 ]
+
+ADMBaseX::initial_data    = "Cartesian Minkowski"
+ADMBaseX::initial_lapse   = "one"
+ADMBaseX::initial_shift   = "zero"
+ADMBaseX::initial_dtlapse = "none"
+ADMBaseX::initial_dtshift = "none"
+
+#ADMBaseX::initial_data    = "tov"
+#ADMBaseX::initial_lapse   = "tov"
+#ADMBaseX::initial_shift   = "tov"
+#ADMBaseX::initial_dtlapse = "zero"
+#ADMBaseX::initial_dtshift = "zero"
+
+#Z4cowGPU::calc_derivs_live = no
+#Z4cowGPU::calc_ADM_vars    = yes
+#Z4cowGPU::calc_constraints = no
+#Z4cowGPU::deriv_order      = 4
+#Z4cowGPU::diss_order       = 5
+#Z4cowGPU::W_floor          = 1.0e-30
+#Z4cowGPU::alphaG_floor     = 1.0e-30
+#Z4cowGPU::epsdiss          = 0.4
+#Z4cowGPU::f_mu_S           = 0.75
+#Z4cowGPU::veta_central     = 2.0
+#Z4cowGPU::veta_width       = 40.00
+#Z4cowGPU::boundary_conditions = "NewRadX"
+
+#ActiveThorns = "TOVSolverX"
+#TOVSolverX::TOV_Rho_Central[0] = 1.28e-3
+#TOVSolverX::TOV_Gamma          = 2.0
+#TOVSolverX::TOV_K              = 100.0
+#TOVSolverX::TOV_Cowling        = no
+
+#AsterSeeds::test_type = "3DTest"
+#AsterSeeds::test_case = "magTOV"
+#AsterSeeds::Afield_config = "internal dipole"
+#AsterSeeds::Ab = 100.0
+#AsterSeeds::press_cut = 0.04
+#AsterSeeds::press_max = 1.638e-4
+#AsterSeeds::Avec_kappa = 2.0
+
+AsterSeeds::test_type = "BBHCloud"
+AsterSeeds::initial_distribution = "constant"
+AsterSeeds::zr_0 = 0.0
+AsterSeeds::rad_ztheta_0 = 0.0
+AsterSeeds::rad_zphi_0 = 0.0
+AsterSeeds::rho_disk = 1.0
+AsterSeeds::disk_width = 10.0
+AsterSeeds::press_disk = 0.001
+AsterSeeds::isentropic = "yes"
+AsterSeeds::add_magnetic_fields = "yes"
+AsterSeeds::nrho = 1.5
+AsterSeeds::npress = 2.5
+AsterSeeds::B_initial = 0.001
+
+AsterX::debug_mode = "no"
+AsterX::flux_type = "HLLE"
+AsterX::vector_potential_gauge = "algebraic"
+AsterX::local_spatial_order = 4
+AsterX::update_tmunu = "no"
+AsterX::local_estimate_error = "no"
+
+ReconX::reconstruction_method = "PPM"
+ReconX::ppm_zone_flattening = "yes"
+ReconX::ppm_shock_detection = "no"
+
+Con2PrimFactory::c2p_prime = "Noble"
+Con2PrimFactory::c2p_second = "Palenzuela"
+Con2PrimFactory::c2p_tol = 1e-8
+Con2PrimFactory::max_iter = 100
+Con2PrimFactory::rho_abs_min = 1e-11
+Con2PrimFactory::atmo_tol = 1e-3
+Con2PrimFactory::unit_test = "yes"
+Con2PrimFactory::B_lim = 1e8
+Con2PrimFactory::vw_lim = 1e8
+Con2PrimFactory::Ye_lenient = "yes"
+
+EOSX::evolution_eos = "IdealGas"
+EOSX::gl_gamma = 2.0
+EOSX::poly_gamma = 2.0
+EOSX::poly_k = 100
+EOSX::rho_max = 1e8
+EOSX::eps_max = 1e8
