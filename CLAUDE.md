@@ -16,7 +16,7 @@ ETK-Scaling-Tests is a scientific computing repository for analyzing scaling per
 
 Copy simulation output files (parameter files and stdout/stderr) from a run directory:
 ```bash
-./Utils/cpfiles.sh <source_directory_prefix>
+./Utils/cp_files.sh <source_directory_prefix>
 ```
 
 Run Jupyter notebooks with Julia kernel for analysis.
@@ -25,7 +25,7 @@ Run Jupyter notebooks with Julia kernel for analysis.
 
 ### Utils/ - Julia Modules
 
-**misc-stdout.jl** (`MiscStdout` module): Parses simulation stdout files to extract metrics.
+**misc_stdout.jl** (`MiscStdout` module): Parses simulation stdout files to extract metrics.
 - `load_avgs(dir_patterns, parent_dir; option, fname)` - Main function for loading averaged metrics
 - `load_data(dirs, parent_dir, option)` - Raw data loading from stdout files
 - `get_matched_dirs(parent_dir, dir_pattern, fname)` - Find simulation directories matching a pattern
@@ -57,7 +57,7 @@ Each run directory contains:
 
 Notebooks in `frontier/2025May/ipynb/` follow this structure:
 ```julia
-include("../../../Utils/misc-stdout.jl")
+include("../../../Utils/misc_stdout.jl")
 patt_dirss = [([(regex_pattern, label), ...], parent_dir, marker), ...]
 dats, labs = MiscStdout.load_avgs(patterns, parent_dir; option="ZcsPerSecond")
 ```
