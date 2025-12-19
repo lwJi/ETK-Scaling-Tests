@@ -16,7 +16,7 @@ ETK-Scaling-Tests is a scientific computing repository for analyzing scaling per
 
 Copy simulation output files (parameter files and stdout/stderr) from a run directory:
 ```bash
-./frontier/2025May/data/cpfiles.sh <source_directory_prefix>
+./Utils/cpfiles.sh <source_directory_prefix>
 ```
 
 Run Jupyter notebooks with Julia kernel for analysis.
