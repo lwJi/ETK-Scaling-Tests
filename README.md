@@ -16,3 +16,13 @@
 | **1000** | 8000 | $20\times20\times20$
 | 1728 | 13824 | $24\times24\times24$
 | **2197** | 17576 | $26\times26\times26$
+
+#### Option 1
+
+For equal mass (resolution) binary case, assume GPUs on finest few levels have $n_x=n_y=\frac{1}{2}n_z$,
+then it has $n_x^3$ GPUs on those levels. We can set $n_x$ to the num of GPUs in $x$-dir of coarse levels.
+
+#### Option 2
+
+For equal mass (resolution) binary case, assume GPUs on finest few levels have $n_x=n_y=n_z$,
+then it has $2 n_x^3$ GPUs on those levels. We can set $n_x = n^{(c)}_x/2^{1/3}$.
