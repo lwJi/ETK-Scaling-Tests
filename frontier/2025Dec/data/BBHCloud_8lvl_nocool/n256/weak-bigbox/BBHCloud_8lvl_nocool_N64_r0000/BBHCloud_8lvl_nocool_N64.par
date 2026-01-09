@@ -1,0 +1,241 @@
+################################################################################
+# Scaling test for BBHDisk simulations
+################################################################################
+
+ActiveThorns = "
+    ADMBaseX
+    BoxInBox
+    CarpetX
+    CoordinatesX
+    HydroBaseX
+    ODESolvers
+    TmunuBaseX
+    AsterX
+    AsterMasks
+    AsterSeeds
+    AnalyticalSpacetimeX
+    #IOUtil
+    #TimerReport
+    #AEILocalInterp
+    #RadiativeCooling
+"
+
+$nlevels	= 8
+$ncells 	= 1024
+$xmin     = -1024.0
+$xmax     = +1024.0
+$itlast   = 1024
+$dtfac    = 0.3
+
+Cactus::cctk_show_schedule = yes
+Cactus::presync_mode = "mixed-error"
+Cactus::terminate = "iteration"
+Cactus::cctk_itlast = $itlast
+
+CarpetX::max_grid_sizes_x = [ 128,  128,  128,  128,  128,  128,  112,  112 ]
+CarpetX::max_grid_sizes_y = [ 128,  128,  128,  128,  128,  128,  112,  112 ]
+CarpetX::max_grid_sizes_z = [ 128,  128,  128,  128,  128,  128,  224,  224 ]
+
+CarpetX::max_tile_size_x = 10240000
+CarpetX::max_tile_size_y = 10240000
+CarpetX::max_tile_size_z = 10240000
+
+CarpetX::blocking_factor_x = 8
+CarpetX::blocking_factor_y = 8
+CarpetX::blocking_factor_z = 8
+
+CarpetX::verbose = no
+CarpetX::poison_undefined_values = no
+
+CarpetX::xmin = $xmin
+CarpetX::ymin = $xmin
+CarpetX::zmin = $xmin
+CarpetX::xmax = $xmax
+CarpetX::ymax = $xmax
+CarpetX::zmax = $xmax
+
+CarpetX::ncells_x = $ncells
+CarpetX::ncells_y = $ncells
+CarpetX::ncells_z = $ncells
+
+CarpetX::boundary_x = "neumann"
+CarpetX::boundary_y = "neumann"
+CarpetX::boundary_z = "neumann"
+CarpetX::boundary_upper_x = "neumann"
+CarpetX::boundary_upper_y = "neumann"
+CarpetX::boundary_upper_z = "neumann"
+
+CarpetX::max_num_levels = $nlevels
+CarpetX::regrid_every = 256
+CarpetX::regrid_error_threshold = 0.9
+
+CarpetX::refine_grid_layout = no
+CarpetX::out_performance_every = 512
+
+CarpetX::prolongation_type = "minmod"
+CarpetX::prolongation_order = 5
+CarpetX::interpolation_order = 1
+CarpetX::ghost_size = 3
+CarpetX::dtfac = $dtfac
+
+CarpetX::use_subcycling_wip = yes
+CarpetX::restrict_during_sync = no
+
+ODESolvers::use_odesolvers_poststep_during_rksubsteps = no
+ODESolvers::verbose = no
+ODESolvers::method = "RK4"
+
+BoxInBox::num_regions = 3
+# Region 1
+BoxInBox::shape_1 = "cube"
+BoxInBox::num_levels_1 = 8
+BoxInBox::position_x_1 = -6.508727e+00
+BoxInBox::position_y_1 = -7.591869e+00
+BoxInBox::radius_1 = [-1., 12., 12., 12., 12., 12., 12., 6.]
+# Region 2
+BoxInBox::shape_2 = "cube"
+BoxInBox::num_levels_2 = 8
+BoxInBox::position_x_2 = 6.508727e+00
+BoxInBox::position_y_2 = 7.591869e+00
+BoxInBox::radius_2 = [-1., 12., 12., 12., 12., 12., 12., 6.]
+# Region 3
+BoxInBox::shape_3 = "cube"
+BoxInBox::num_levels_3 = 6 #7
+BoxInBox::radius_3 = [-1., 512., 256., 128., 64., 32.] #, 20.]
+
+ADMBaseX::initial_data = "analytical_spacetime"
+ADMBaseX::initial_lapse = "analytical_spacetime"
+ADMBaseX::initial_shift = "analytical_spacetime"
+#ADMBaseX::initial_dtlapse = "zero"
+#ADMBaseX::initial_dtshift = "zero"
+
+AnalyticalSpacetimeX::analytical_metric_type = "SuperposedBBH" #"BoostedBH"
+AnalyticalSpacetimeX::traj_read_table = "yes"
+AnalyticalSpacetimeX::traj_print_every = 128
+AnalyticalSpacetimeX::traj_print = "no" #"yes"
+AnalyticalSpacetimeX::traj_table_name = "/lustre/orion/ast232/scratch/liwei/CheckPoint/Trajs/CircularOrbit_pp08_q1_sep20.h5"
+AnalyticalSpacetimeX::AST_adjust_mass1 = 1.0
+AnalyticalSpacetimeX::AST_adjust_mass2 = 1.0
+AnalyticalSpacetimeX::set_positions = "yes"
+#AnalyticalSpacetimeX::surf_storage_BH1 = 0
+#AnalyticalSpacetimeX::surf_storage_BH2 = 1
+AnalyticalSpacetimeX::AST_cutoff_floor = 1e-1
+AnalyticalSpacetimeX::AST_a1_buffer = 0.01
+AnalyticalSpacetimeX::AST_a2_buffer = 0.01
+AnalyticalSpacetimeX::move_every = 1
+AnalyticalSpacetimeX::evolve_metric_every = 1
+AnalyticalSpacetimeX::set_analytic_metric_always = "yes"
+
+AsterSeeds::test_type = "BBHCloud"
+AsterSeeds::initial_distribution = "constant"
+AsterSeeds::rho_disk = 1.0
+AsterSeeds::isentropic = "yes"
+AsterSeeds::add_magnetic_fields = "yes"
+AsterSeeds::B_initial = 1e-4
+
+AsterX::debug_mode = "no"
+AsterX::flux_type = "HLLE"
+AsterX::vector_potential_gauge = "generalized Lorenz"
+AsterX::lorenz_damp_fac = 1.5 / ($dtfac* ((2 * $xmax)/$ncells))
+AsterX::local_spatial_order = 4
+AsterX::local_estimate_error = "no"
+AsterX::update_tmunu = "no"
+AsterX::recon_type = "z_vec"
+AsterX::use_uct = "yes"
+AsterX::use_entropy_fix = "yes"
+AsterX::use_mask = "yes"
+AsterX::excise = "yes"
+AsterX::zero_psi = "yes"
+
+ReconX::reconstruction_method = "ppm"
+ReconX::ppm_zone_flattening = "yes"
+ReconX::ppm_shock_detection = "no"
+
+Con2PrimFactory::unit_test = "yes"
+Con2PrimFactory::c2p_prime = "Noble"
+Con2PrimFactory::c2p_second = "Palenzuela"
+Con2PrimFactory::c2p_tol = 1e-12
+Con2PrimFactory::max_iter = 1000
+
+Con2PrimFactory::rho_abs_min = 3.442651863295482e-12
+Con2PrimFactory::atmo_tol = 1e-3
+Con2PrimFactory::B_lim = 1e8
+Con2PrimFactory::vw_lim = 10.0
+
+Con2PrimFactory::cons_error_limit = -10.0
+Con2PrimFactory::use_z = "yes"
+Con2PrimFactory::alp_thresh = 0.0
+Con2PrimFactory::rho_BH     = 3.442651863295482e-12
+Con2PrimFactory::eps_BH     = 1.e-10
+Con2PrimFactory::vwlim_BH   = 0.0
+
+Con2PrimFactory::use_temperature = "no"
+Con2PrimFactory::p_atmo   = 1.5300674947979775e-15
+Con2PrimFactory::r_atmo            = 15.0
+Con2PrimFactory::n_rho_atmo        = 1.5
+Con2PrimFactory::tauFluid_atmo     = 1e-15
+Con2PrimFactory::t_atmo            = 0.00044444444444444
+Con2PrimFactory::n_temp_atmo       = 1.0
+Con2PrimFactory::n_press_atmo      = 2.5
+Con2PrimFactory::thermal_eos_atmo  = "yes"
+
+EOSX::evolution_eos = "IdealGas"
+EOSX::gl_gamma = 1.66666666666667
+EOSX::poly_gamma = 1.66666666666667
+EOSX::poly_k = 0.2
+EOSX::rho_max = 1e20
+EOSX::rho_min = 1e-30
+EOSX::eps_max = 1e10
+EOSX::eps_min = 1e-30
+EOSX::particle_mass = 1.0
+
+#IO::out_dir = $parfile
+#IO::out_every = 512
+#
+#CarpetX::out_norm_omit_unstable = yes
+#CarpetX::out_norm_every = 256
+#CarpetX::out_norm_vars = "
+#    ADMBaseX::lapse
+#    ADMBaseX::shift
+#    ADMBaseX::metric
+#    HydroBaseX::rho
+#    HydroBaseX::vel
+#    HydroBaseX::eps
+#    HydroBaseX::press
+#    HydroBaseX::temperature
+#    HydroBaseX::Bvec
+#    HydroBaseX::entropy
+#    HydroBaseX::Ye
+#"
+#
+##CarpetX::openpmd_format = "HDF5"
+#CarpetX::out_openpmd_every = 0 #400
+#CarpetX::out_openpmd_vars = ""
+#
+#CarpetX::out_silo_vars = "
+#    ADMBaseX::lapse
+#    ADMBaseX::shift
+#    ADMBaseX::metric
+#    HydroBaseX::rho
+#    HydroBaseX::vel
+#    HydroBaseX::eps
+#    HydroBaseX::press
+#    HydroBaseX::temperature
+#    HydroBaseX::Bvec
+#    HydroBaseX::entropy
+#    HydroBaseX::Ye
+#"
+#
+#CarpetX::out_tsv_vars = "
+#    ADMBaseX::lapse
+#    ADMBaseX::shift
+#    ADMBaseX::metric
+#    HydroBaseX::rho
+#    HydroBaseX::vel
+#    HydroBaseX::eps
+#    HydroBaseX::press
+#    HydroBaseX::temperature
+#    HydroBaseX::Bvec
+#    HydroBaseX::entropy
+#    HydroBaseX::Ye
+#"
