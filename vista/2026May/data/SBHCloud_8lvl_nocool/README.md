@@ -37,11 +37,11 @@ Target resolution
 Translation to Nodes:
 
 $$
-\left(\frac{\Delta x}{8}\times [\text{node per dim for}\, \Delta x]\right)^3
+\left(\frac{\Delta x}{8}\times [\text{node per dim for } \Delta x]\right)^3
 $$
 
 Translation to Speed:
 
 $$
-[\text{speed get for}\, \Delta x] \times \left(\frac{8}{\Delta x}\right)
+[\text{speed get for }\Delta x] \times \left(\frac{8}{\Delta x}\right)
 $$
