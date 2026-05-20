@@ -23,25 +23,25 @@
 | G4 | 4096 | 2048 | 1024 |  512 | 256 | 128 |  64 | 46.1 | 33.2 | 24 |
 
 Target resolution
-* on finest: $\frac{24}{3072}=2^{-7}=0.0078125$
-* on coarest: $\frac{960}{240}=4$
+* on finest: $\frac{24\times2}{3072}=2^{-6}=0.015625$
+* on coarest: $\frac{960\times 2}{240}=8$
 
-| Mesh | dx | M/h | Zcs/s (10^7) | Nodes for Prod | Speed for Prod (M/h) |
-|:----:|:----:|:----:|:----:|:----:|:----:|
-| G1       | 34.3 |  73.0 | 1.71 |  631 |  8.5 |
-| G2       | 69.8 | 654.4 | 7.37 | 5314 | 37.5 |
-| G3       | 56.9 | 351.4 | 3.96 | 2878 | 24.7 |
-| G4 (96)  | 42.7 | 157.8 | 2.18 | 1216 | 14.8 |
-| G4 (104) | 39.4 | 114.3 | 2.19 |  956 | 11.6 |
+| Mesh | dx | M/h | Zcs/s (10^7) | Nodes for Prod | Speed for Prod (M/h) | SUs/15000M | Walltime (days) |
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+| G1       |  68.6 |  73.0 | 1.71 |  631 |  8.5 | 1113529 | 74 |
+| G2       | 139.6 | 654.4 | 7.37 | 5314 | 37.5 |  |
+| G3       | 113.8 | 351.4 | 3.96 | 2878 | 24.7 | 
+| G4 (96)  |  85.4 | 157.8 | 2.18 | 1216 | 14.8 | 
+| G4 (104) |  78.8 | 114.3 | 2.19 |  956 | 11.6 | 
 
 Translation to Nodes:
 
 $$
-\left(\frac{\Delta x}{4}\times [\text{node per dim for}\, \Delta x]\right)^3
+\left(\frac{\Delta x}{8}\times [\text{node per dim for}\, \Delta x]\right)^3
 $$
 
 Translation to Speed:
 
 $$
-[\text{speed get for}\, \Delta x] \times \left(\frac{4}{\Delta x}\right)
+[\text{speed get for}\, \Delta x] \times \left(\frac{8}{\Delta x}\right)
 $$
