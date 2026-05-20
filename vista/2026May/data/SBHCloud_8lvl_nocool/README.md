@@ -21,5 +21,24 @@
 | G2 | 12288 | 6144 | 3072 | 1536 | 768 | 384 | 192 | 96 | 48 | 24 |
 | G3 | 8192 | 4096 | 2048 | 1024 | 512 | 256 | 128 | 64 | 48 | 24 |
 
-| Mesh |
-|:----:|
+Target resolution
+* on finest: $\frac{24}{3072}=2^{-7}=0.0078125$
+* on coarest: $\frac{960}{240}=4$
+
+| Mesh | $\Delta x$ | M/h | Zcs/s | Nodes for Prod | Speed for Prod (M/h) |
+|:----:|:----:|:----:|:----:|:----:|:----:|
+| G1 | 34.3 | 73.0 | $1.7\times10^7$ | ~631  | ~8.5 |
+| G2 | 69.8 | 654.4 | $7.4\times10^7$ | ~5314 | ~37.5 |
+| G3 | 56.9 | 351.4 | $4.0\times10^7$ | ~2878 | ~24.7 |
+
+Translation to Nodes:
+
+$$
+\left(\frac{\Delta x}{4}\times [\text{node per dim for}\, \Delta x]\right)^3
+$$
+
+Translation to Speed:
+
+$$
+[\text{speed get for}\, \Delta x] \times \left(\frac{4}{\Delta x}\right)
+$$
