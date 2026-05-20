@@ -25,11 +25,11 @@ Target resolution
 * on finest: $\frac{24}{3072}=2^{-7}=0.0078125$
 * on coarest: $\frac{960}{240}=4$
 
-| Mesh | $\Delta x$ | M/h | Zcs/s | Nodes for Prod | Speed for Prod (M/h) |
+| Mesh | $\Delta x$ | M/h | Zcs/s (10^7) | Nodes for Prod | Speed for Prod (M/h) |
 |:----:|:----:|:----:|:----:|:----:|:----:|
-| G1 | 34.3 | 73.0 | $1.7\times10^7$ | ~631  | ~8.5 |
-| G2 | 69.8 | 654.4 | $7.4\times10^7$ | ~5314 | ~37.5 |
-| G3 | 56.9 | 351.4 | $4.0\times10^7$ | ~2878 | ~24.7 |
+| G1 | 34.3 |  73.0 | 1.7 |  631 |  8.5 |
+| G2 | 69.8 | 654.4 | 7.4 | 5314 | 37.5 |
+| G3 | 56.9 | 351.4 | 4.0 | 2878 | 24.7 |
 
 Translation to Nodes:
 
