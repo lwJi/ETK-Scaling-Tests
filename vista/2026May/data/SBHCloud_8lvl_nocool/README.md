@@ -45,3 +45,12 @@ Translation to Speed:
 $$
 [\text{speed get for }\Delta x] \times \left(\frac{8}{\Delta x}\right)
 $$
+
+## Vista vs Horizon
+
+| | Vista | Horizon |
+|:---:|:---:|:---:|
+| # of nodes      | 600 Grace Hopper | 2000 Grace Blackwell |
+| GPUs per node   | 1 | 2 |
+| Memory per GPU  | **96 GB** HBM3 + 116GB LPDDR | **185 GB** HBM3 + 120 GB LPDDR5X |
+| FP64 per node   | 34 TFlops | 80 TFlops |
