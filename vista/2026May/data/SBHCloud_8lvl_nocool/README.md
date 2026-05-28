@@ -1,5 +1,7 @@
 # SBH
 
+**THIS DIR IS MISNAMED, IT USES 10 LEVELS INSTEAD of 8 LEVELS**
+
 | Radius | cells| cells/2 | cells/4 | cells/3 | cells/6 | cells x 7/15 |
 |:------:|:----:|:----:|:----:|:----:|:----:|:----:|
 | 960 |  240 |  120 |  60 |   80   |  40   |  112   |
