@@ -13,3 +13,7 @@
 |  9x2 | 288^3x2 |
 
 Target $dx=8$
+
+| Mesh | dx | M/h | Zcs/s (10^7) | Nodes for Prod | Speed for Prod (M/h) | SUs/15000M | Walltime (days) |
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+| G1   | 8.0 |    |              |                |                      |            |  |
